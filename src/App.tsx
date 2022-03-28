@@ -2,7 +2,14 @@ import React from 'react'
 
 import reactLogo, { ReactComponent as ReactLogo } from 'assets/images/react.svg'
 import { Button } from './components/Button'
-import { UserItem } from './components/UserItem'
+import { UserList } from './components/UserList'
+import { User } from './components/UserList/types'
+
+const users: User[] = [
+  { id: 10, name: 'John Snow' },
+  { id: 20, name: 'Aria Stark' },
+  { id: 30, name: 'Tiryon Lenyster' },
+]
 
 export const App: React.FC = () => {
   return (
@@ -31,10 +38,9 @@ export const App: React.FC = () => {
         Warning Button
       </Button>
 
-      <UserItem
-        id={22}
-        name="John Smith"
-        onClick={(id) => console.log('id', id)}
+      <UserList
+        users={users}
+        onUserSelect={(id) => console.log(`User selected id ${id}`)}
       />
     </>
   )
