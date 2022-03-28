@@ -41,6 +41,7 @@ export const App: React.FC = () => {
       <UserList
         users={users}
         onUserSelect={(id) => console.log(`User selected id ${id}`)}
+        onAddUser={(name) => console.log(`The new user is: ${name}`)}
       />
     </>
   )
