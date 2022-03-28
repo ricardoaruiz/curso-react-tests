@@ -2,6 +2,7 @@ import React from 'react'
 
 import reactLogo, { ReactComponent as ReactLogo } from 'assets/images/react.svg'
 import { Button } from './components/Button'
+import { UserItem } from './components/UserItem'
 
 export const App: React.FC = () => {
   return (
@@ -29,6 +30,12 @@ export const App: React.FC = () => {
       <Button variant="warning" disabled>
         Warning Button
       </Button>
+
+      <UserItem
+        id={22}
+        name="John Smith"
+        onClick={(id) => console.log('id', id)}
+      />
     </>
   )
 }
