@@ -4,6 +4,43 @@ import reactLogo, { ReactComponent as ReactLogo } from 'assets/images/react.svg'
 import { Button } from './components/Button'
 import { UserList } from './components/UserList'
 import { User } from './components/UserList/types'
+import { Messages } from './components/Messages'
+import { LoggedUser, Message } from './components/Messages/types'
+
+const loggedUser: LoggedUser = { id: 10, name: 'John Snow' }
+
+const items: Message[] = [
+  {
+    id: 1,
+    from: { id: 10, name: 'John Snow' },
+    text: 'This is a message from user with id 10',
+  },
+  {
+    id: 2,
+    from: { id: 10, name: 'John Snow' },
+    text: 'This is other message from user with id 10',
+  },
+  {
+    id: 3,
+    from: { id: 20, name: 'Aria Stark' },
+    text: 'This is a message from user with id 20',
+  },
+  {
+    id: 4,
+    from: { id: 30, name: 'Tiryon Lenyster' },
+    text: 'This is a message from user with id 30',
+  },
+  {
+    id: 5,
+    from: { id: 20, name: 'Aria Stark' },
+    text: 'This is other message from user with id 20',
+  },
+  {
+    id: 6,
+    from: { id: 20, name: 'Aria Stark' },
+    text: 'This is other message from user with id 20',
+  },
+]
 
 const users: User[] = [
   { id: 10, name: 'John Snow' },
@@ -37,6 +74,12 @@ export const App: React.FC = () => {
       <Button variant="warning" disabled>
         Warning Button
       </Button>
+
+      <Messages
+        loggedUser={loggedUser}
+        items={items}
+        onSendMessage={(message) => console.log(message)}
+      />
 
       <UserList
         users={users}
