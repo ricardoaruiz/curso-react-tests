@@ -6,24 +6,18 @@ import { Button } from '../Button'
 
 import * as S from './styles'
 
-export const UserList: React.VFC<UserListProps> = ({
+const UserList: React.VFC<UserListProps> = ({
   users,
   onUserSelect,
   onAddUser,
 }) => {
-  const [newUser, setNewUser] = React.useState('')
-
-  const handleNewUserInputChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setNewUser(event.target.value)
-    },
-    []
-  )
+  const newUserInputRef = React.useRef<HTMLInputElement | null>(null)
 
   const handleAddButtonClick = React.useCallback(() => {
-    onAddUser(newUser)
-    setNewUser('')
-  }, [newUser, onAddUser])
+    if (!newUserInputRef.current?.value) return
+    onAddUser(newUserInputRef.current.value)
+    newUserInputRef.current.value = ''
+  }, [onAddUser])
 
   return (
     <S.Wrapper>
@@ -46,12 +40,9 @@ export const UserList: React.VFC<UserListProps> = ({
               name="newUser"
               id="newUser"
               placeholder="Type user name"
-              value={newUser}
-              onChange={handleNewUserInputChange}
+              ref={newUserInputRef}
             />
-            <Button onClick={handleAddButtonClick} disabled={!newUser}>
-              Add user
-            </Button>
+            <Button onClick={handleAddButtonClick}>Add user</Button>
           </S.Controls>
         </>
       )}
@@ -59,3 +50,6 @@ export const UserList: React.VFC<UserListProps> = ({
     </S.Wrapper>
   )
 }
+
+const MemoizedUserList = React.memo(UserList)
+export { MemoizedUserList as UserList }

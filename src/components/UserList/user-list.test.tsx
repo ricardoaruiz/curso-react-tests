@@ -66,19 +66,16 @@ describe('<UserList />', () => {
 
     const addButton = screen.getByRole('button', { name: /add user/i })
     expect(addButton).toBeInTheDocument()
-    expect(addButton).toBeDisabled()
 
     const input = screen.getByPlaceholderText(/type user name/i)
     expect(input).toBeInTheDocument()
     userEvent.clear(input)
     userEvent.type(input, 'Aria Stark')
 
-    expect(addButton).toBeEnabled()
     userEvent.click(addButton)
     expect(mockedonAddUser).toHaveBeenCalledTimes(1)
     expect(mockedonAddUser).toHaveBeenCalledWith('Aria Stark')
     expect(input).toHaveTextContent('')
-    expect(addButton).toBeDisabled()
   })
 
   it('should not be call addUser callback when "Add user" button is clicked and user field is empty', () => {
@@ -93,9 +90,6 @@ describe('<UserList />', () => {
 
     const addButton = screen.getByRole('button', { name: /add user/i })
     expect(addButton).toBeInTheDocument()
-    expect(addButton).toBeDisabled()
-
-    expect(addButton).toBeDisabled()
     userEvent.click(addButton)
     expect(mockedonAddUser).not.toHaveBeenCalled()
   })

@@ -4,32 +4,27 @@ import { Button } from '../Button'
 
 import * as S from './styles'
 
-export const Messages: React.VFC<MessagesProps> = ({
+const Messages: React.VFC<MessagesProps> = ({
   loggedUser,
   items,
   onSendMessage,
 }) => {
-  const [message, setMessage] = React.useState('')
-
-  const handleInputMessageChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setMessage(event.target.value)
-    },
-    []
-  )
+  const inputNewMessageRef = React.useRef<HTMLInputElement | null>(null)
 
   const nextMessageId = React.useMemo(() => {
     return !items.length ? 1 : items[items.length - 1].id + 1
   }, [items])
 
   const handleSendMessageButtonClick = React.useCallback(() => {
+    if (!inputNewMessageRef.current?.value) return
+
     onSendMessage({
       id: nextMessageId,
       from: loggedUser,
-      text: message,
+      text: inputNewMessageRef.current.value,
     })
-    setMessage('')
-  }, [loggedUser, message, nextMessageId, onSendMessage])
+    inputNewMessageRef.current.value = ''
+  }, [loggedUser, nextMessageId, onSendMessage])
 
   return (
     <S.Wrapper>
@@ -48,13 +43,13 @@ export const Messages: React.VFC<MessagesProps> = ({
           name="message"
           id="message"
           placeholder="Type your message here"
-          value={message}
-          onChange={handleInputMessageChange}
+          ref={inputNewMessageRef}
         />
-        <Button disabled={!message} onClick={handleSendMessageButtonClick}>
-          Send Message
-        </Button>
+        <Button onClick={handleSendMessageButtonClick}>Send Message</Button>
       </S.Controls>
     </S.Wrapper>
   )
 }
+
+const MemoizedMessages = React.memo(Messages)
+export { MemoizedMessages as Messages }

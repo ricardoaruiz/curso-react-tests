@@ -87,13 +87,11 @@ describe('<Messages />', () => {
       name: /send message/i,
     })
     expect(sendMessageButton).toBeInTheDocument()
-    expect(sendMessageButton).toBeDisabled()
 
     const inputMessage = screen.getByPlaceholderText(/type your message here/i)
     expect(inputMessage).toBeInTheDocument()
     userEvent.clear(inputMessage)
     userEvent.type(inputMessage, 'This is a new message from user id 10')
-    expect(sendMessageButton).toBeEnabled()
 
     userEvent.click(sendMessageButton)
     expect(mockedOnSendMessage).toHaveBeenCalledTimes(1)
@@ -103,7 +101,6 @@ describe('<Messages />', () => {
       text: 'This is a new message from user id 10',
     })
     expect(inputMessage).toHaveValue('')
-    expect(sendMessageButton).toBeDisabled()
   })
 
   it('should not be call onSendMessage callback when "Send Message" button is clicked and message field is empty', () => {
@@ -120,7 +117,6 @@ describe('<Messages />', () => {
       name: /send message/i,
     })
     expect(sendMessageButton).toBeInTheDocument()
-    expect(sendMessageButton).toBeDisabled()
 
     userEvent.click(sendMessageButton)
     expect(mockedOnSendMessage).not.toHaveBeenCalled()
