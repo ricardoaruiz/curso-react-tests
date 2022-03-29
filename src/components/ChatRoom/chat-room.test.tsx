@@ -1,6 +1,6 @@
 /* eslint-disable testing-library/no-node-access */
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { ChatRoom } from '.'
@@ -9,24 +9,26 @@ import { LoggedUser } from '../Messages/types'
 const loggedUser: LoggedUser = { id: 10, name: 'John Snow' }
 
 describe('<ChatRoom />', () => {
-  it('should be render with send messages and logged users', () => {
+  it('should be render with send messages and logged users', async () => {
     render(<ChatRoom loggedUser={loggedUser} />)
 
-    const userList = screen.getByRole('list', { name: /chat users/i })
+    const userList = await screen.findByRole('list', { name: /chat users/i })
     expect(userList).toBeInTheDocument()
     const users = userList.children
     expect(users).toHaveLength(3)
 
-    const messageList = screen.getByRole('list', { name: /chat messages/i })
+    const messageList = await screen.findByRole('list', {
+      name: /chat messages/i,
+    })
     expect(messageList).toBeInTheDocument()
     const messages = messageList.children
     expect(messages).toHaveLength(6)
   })
 
-  it('should be add new user on user list', () => {
+  it('should be add new user on user list', async () => {
     render(<ChatRoom loggedUser={loggedUser} />)
 
-    const userList = screen.getByRole('list', { name: /chat users/i })
+    const userList = await screen.findByRole('list', { name: /chat users/i })
     expect(userList).toBeInTheDocument()
     const users = userList.children
     expect(users).toHaveLength(3)
@@ -43,13 +45,19 @@ describe('<ChatRoom />', () => {
     expect(users).toHaveLength(4)
   })
 
-  it('should be send new message', () => {
+  it('should be send new message', async () => {
     render(<ChatRoom loggedUser={loggedUser} />)
 
-    const messageList = screen.getByRole('list', { name: /chat messages/i })
+    const messageList = await screen.findByRole('list', {
+      name: /chat messages/i,
+    })
     expect(messageList).toBeInTheDocument()
-    const messages = messageList.children
-    expect(messages).toHaveLength(6)
+
+    await waitFor(() => {
+      const messages = messageList.children
+      expect(messages).toHaveLength(6)
+      return messages
+    })
 
     const inputMessage = screen.getByPlaceholderText(/type your message here/i)
     userEvent.clear(inputMessage)
@@ -58,7 +66,12 @@ describe('<ChatRoom />', () => {
     const sendMessageButton = screen.getByRole('button', {
       name: /send message/i,
     })
+
     userEvent.click(sendMessageButton)
-    expect(messages).toHaveLength(7)
+    await waitFor(() => {
+      const messages = messageList.children
+      expect(messages).toHaveLength(7)
+      return messages
+    })
   })
 })

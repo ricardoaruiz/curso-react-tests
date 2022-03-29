@@ -1,4 +1,5 @@
 import React from 'react'
+import axios from 'axios'
 
 import { ChatRoomProps } from './types'
 import { UserList } from '../UserList'
@@ -8,49 +9,9 @@ import { Messages } from '../Messages'
 
 import * as S from './styles'
 
-const users: User[] = [
-  { id: 10, name: 'John Snow' },
-  { id: 20, name: 'Aria Stark' },
-  { id: 30, name: 'Tiryon Lenyster' },
-]
-
-const messages: Message[] = [
-  {
-    id: 1,
-    from: { id: 10, name: 'John Snow' },
-    text: 'This is a message from user with id 10',
-  },
-  {
-    id: 2,
-    from: { id: 10, name: 'John Snow' },
-    text: 'This is other message from user with id 10',
-  },
-  {
-    id: 3,
-    from: { id: 20, name: 'Aria Stark' },
-    text: 'This is a message from user with id 20',
-  },
-  {
-    id: 4,
-    from: { id: 30, name: 'Tiryon Lenyster' },
-    text: 'This is a message from user with id 30',
-  },
-  {
-    id: 5,
-    from: { id: 20, name: 'Aria Stark' },
-    text: 'This is other message from user with id 20',
-  },
-  {
-    id: 6,
-    from: { id: 20, name: 'Aria Stark' },
-    text: 'This is other message from user with id 20',
-  },
-]
-
 export const ChatRoom: React.VFC<ChatRoomProps> = ({ loggedUser }) => {
-  const [inChatUsers, setInChatUsers] = React.useState<User[]>(users)
-  const [inChatMessages, setInChatMessages] =
-    React.useState<Message[]>(messages)
+  const [inChatUsers, setInChatUsers] = React.useState<User[]>([])
+  const [inChatMessages, setInChatMessages] = React.useState<Message[]>([])
 
   const handleSendMessage = React.useCallback((message: Message) => {
     setInChatMessages((state) => {
@@ -65,17 +26,34 @@ export const ChatRoom: React.VFC<ChatRoomProps> = ({ loggedUser }) => {
     })
   }, [])
 
-  const handleAddUser = React.useCallback((name: string) => {
+  const handleAddUser = React.useCallback(async (name: string) => {
     setInChatUsers((state) => {
       const nextId = state.length ? state[state.length - 1].id + 10 : 10
-      return [
-        ...state,
-        {
-          id: nextId,
-          name,
-        },
-      ]
+
+      const newUser = {
+        id: nextId,
+        name,
+      }
+
+      return [...state, { ...newUser }]
     })
+  }, [])
+
+  React.useEffect(() => {
+    const loadInChatUsers = async () => {
+      const response = await axios.get<User[]>('http://localhost:9000/users')
+      setInChatUsers(response.data)
+    }
+
+    const loadInChatMessages = async () => {
+      const response = await axios.get<Message[]>(
+        'http://localhost:9000/messages'
+      )
+      setInChatMessages(response.data)
+    }
+
+    loadInChatUsers()
+    loadInChatMessages()
   }, [])
 
   return (
