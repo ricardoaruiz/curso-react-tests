@@ -33,7 +33,7 @@ export const Messages: React.VFC<MessagesProps> = ({
 
   return (
     <S.Wrapper>
-      <S.Messages>
+      <S.Messages aria-label="chat messages">
         {items.map(({ id, from, text }) => (
           <S.Message
             key={id}

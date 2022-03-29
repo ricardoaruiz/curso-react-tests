@@ -29,9 +29,14 @@ export const UserList: React.VFC<UserListProps> = ({
     <S.Wrapper>
       {users.length && (
         <>
-          <S.List>
+          <S.List aria-label="chat users">
             {users.map(({ id, name }) => (
-              <UserItem key={id} id={id} name={name} onClick={onUserSelect} />
+              <UserItem
+                key={id}
+                id={id}
+                name={name}
+                onClick={() => onUserSelect && onUserSelect(id)}
+              />
             ))}
           </S.List>
 

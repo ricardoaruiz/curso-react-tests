@@ -1,6 +1,6 @@
 export type UserListProps = {
   users: User[]
-  onUserSelect: (id: number) => void
+  onUserSelect?: (id: number) => void
   onAddUser: (name: string) => void
 }
 
