@@ -23,6 +23,14 @@ export const IN_CHAT_USERS_SUCCESS = (
   )
 }
 
+export const ADD_IN_CHAT_USERS_SUCCESS = (
+  req: RestRequest,
+  res: ResponseComposition,
+  ctx: RestContext
+) => {
+  return res(ctx.status(201))
+}
+
 export const IN_CHAT_MESSAGE_SUCCESS = (
   req: RestRequest,
   res: ResponseComposition,
@@ -63,4 +71,12 @@ export const IN_CHAT_MESSAGE_SUCCESS = (
       },
     ])
   )
+}
+
+export const ADD_IN_CHAT_MESSAGE_SUCCESS = (
+  req: RestRequest,
+  res: ResponseComposition,
+  ctx: RestContext
+) => {
+  return res(ctx.status(201))
 }

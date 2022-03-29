@@ -42,7 +42,11 @@ describe('<ChatRoom />', () => {
     userEvent.clear(newUserInput)
     userEvent.type(newUserInput, 'Bruce Benner')
     userEvent.click(addUserButton)
-    expect(users).toHaveLength(4)
+
+    await waitFor(() => {
+      const users = userList.children
+      expect(users).toHaveLength(4)
+    })
   })
 
   it('should be send new message', async () => {
