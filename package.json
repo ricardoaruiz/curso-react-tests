@@ -11,6 +11,7 @@
     "test:watch": "jest --watchAll --verbose --coverage false",
     "lint": "eslint src",
     "commit": "cz",
+    "backend:local": "json-server ./backend/data.json -p 9000",
     "prepare": "husky install"
   },
   "dependencies": {
@@ -56,6 +57,7 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^27.5.1",
     "jest-transform-stub": "^2.0.0",
+    "json-server": "^0.17.0",
     "lint-staged": "^12.3.7",
     "node-sass": "^7.0.1",
     "prettier": "^2.6.1",
