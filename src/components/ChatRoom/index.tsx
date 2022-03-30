@@ -1,43 +1,48 @@
 import React from 'react'
-import axios from 'axios'
 
 import { ChatRoomProps } from './types'
 import { UserList } from '../UserList'
 import { User } from '../UserList/types'
 import { Message } from '../Messages/types'
 import { Messages } from '../Messages'
+import { useUser } from '../../services/useUser'
+import { useMessage } from '../../services/useMessage'
 
 import * as S from './styles'
 
-const BACKEND_BASE_URL = 'http://localhost:9000'
-
 export const ChatRoom: React.VFC<ChatRoomProps> = ({ loggedUser }) => {
+  const { getInChatUsers, addInChatUser } = useUser()
+  const { getInChatMessages, addInChatMessage } = useMessage()
+
   const [inChatUsers, setInChatUsers] = React.useState<User[]>([])
   const [inChatMessages, setInChatMessages] = React.useState<Message[]>([])
 
-  const handleSendMessage = React.useCallback(async (message: Message) => {
-    try {
-      const newMessage = {
-        id: message.id,
-        from: message.from,
-        text: message.text,
+  const handleSendMessage = React.useCallback(
+    async (message: Message) => {
+      try {
+        const newMessage = {
+          id: message.id,
+          from: message.from,
+          text: message.text,
+        }
+
+        await addInChatMessage(newMessage)
+
+        setInChatMessages((state) => {
+          return [
+            ...state,
+            {
+              ...newMessage,
+            },
+          ]
+        })
+      } catch (error) {
+        // TODO must handle error
+        console.error('ChatRoom.handleSendMessage', error)
       }
-
-      await axios.post(`${BACKEND_BASE_URL}/messages`, newMessage)
-
-      setInChatMessages((state) => {
-        return [
-          ...state,
-          {
-            ...newMessage,
-          },
-        ]
-      })
-    } catch (error) {
-      // TODO must handle error
-      console.error(error)
-    }
-  }, [])
+    },
+    [addInChatMessage]
+  )
 
   const handleAddUser = React.useCallback(
     async (name: string) => {
@@ -51,32 +56,30 @@ export const ChatRoom: React.VFC<ChatRoomProps> = ({ loggedUser }) => {
       }
 
       try {
-        await axios.post(`${BACKEND_BASE_URL}/users`, newUser)
+        await addInChatUser(newUser)
         setInChatUsers([...inChatUsers, { ...newUser }])
       } catch (error) {
         //TODO must handle error
-        console.error(error)
+        console.error('ChatRoom.handleAddUser', error)
       }
     },
-    [inChatUsers]
+    [addInChatUser, inChatUsers]
   )
 
   React.useEffect(() => {
     const loadInChatUsers = async () => {
-      const response = await axios.get<User[]>(`${BACKEND_BASE_URL}/users`)
-      setInChatUsers(response.data)
+      const inChatUsers = await getInChatUsers()
+      setInChatUsers(inChatUsers)
     }
 
     const loadInChatMessages = async () => {
-      const response = await axios.get<Message[]>(
-        `${BACKEND_BASE_URL}/messages`
-      )
-      setInChatMessages(response.data)
+      const inChatMessages = await getInChatMessages()
+      setInChatMessages(inChatMessages)
     }
 
     loadInChatUsers()
     loadInChatMessages()
-  }, [])
+  }, [getInChatMessages, getInChatUsers])
 
   return (
     <S.Wrapper>
