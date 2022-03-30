@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { UserList } from '.'
@@ -54,7 +54,7 @@ describe('<UserList />', () => {
     expect(mockedOnUserSelect).toHaveBeenCalledWith(10)
   })
 
-  it('should be call addUser callback when "Add user" button is clicked and user field was informed', () => {
+  it('should be call addUser callback when "Add user" button is clicked and user field was informed', async () => {
     const mockedonAddUser = jest.fn()
     render(
       <UserList
@@ -66,19 +66,29 @@ describe('<UserList />', () => {
 
     const addButton = screen.getByRole('button', { name: /add user/i })
     expect(addButton).toBeInTheDocument()
+    expect(addButton).toBeDisabled()
 
     const input = screen.getByPlaceholderText(/type user name/i)
     expect(input).toBeInTheDocument()
-    userEvent.clear(input)
-    userEvent.type(input, 'Aria Stark')
 
-    userEvent.click(addButton)
+    await act(async () => {
+      userEvent.clear(input)
+      userEvent.type(input, 'Aria Stark')
+      userEvent.tab()
+    })
+
+    expect(addButton).toBeEnabled()
+
+    await act(async () => {
+      userEvent.click(addButton)
+    })
+
     expect(mockedonAddUser).toHaveBeenCalledTimes(1)
     expect(mockedonAddUser).toHaveBeenCalledWith('Aria Stark')
     expect(input).toHaveTextContent('')
   })
 
-  it('should not be call addUser callback when "Add user" button is clicked and user field is empty', () => {
+  it('should not be call addUser callback when "Add user" button is clicked and user field is empty', async () => {
     const mockedonAddUser = jest.fn()
     render(
       <UserList
@@ -90,7 +100,12 @@ describe('<UserList />', () => {
 
     const addButton = screen.getByRole('button', { name: /add user/i })
     expect(addButton).toBeInTheDocument()
-    userEvent.click(addButton)
+    expect(addButton).toBeDisabled()
+
+    await act(async () => {
+      userEvent.click(addButton)
+    })
+
     expect(mockedonAddUser).not.toHaveBeenCalled()
   })
 })

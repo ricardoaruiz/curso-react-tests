@@ -1,23 +1,43 @@
 import React from 'react'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
 
 import { UserItem } from '../UserItem'
-import { UserListProps } from './types'
+import { UserListProps, FormData } from './types'
 import { Button } from '../Button'
 
 import * as S from './styles'
+
+const schema = yup
+  .object({
+    name: yup.string().required('User name is required'),
+  })
+  .required()
 
 const UserList: React.VFC<UserListProps> = ({
   users,
   onUserSelect,
   onAddUser,
 }) => {
-  const newUserInputRef = React.useRef<HTMLInputElement | null>(null)
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { isDirty, isValid },
+  } = useForm<FormData>({
+    mode: 'all',
+    resolver: yupResolver(schema),
+  })
 
-  const handleAddButtonClick = React.useCallback(() => {
-    if (!newUserInputRef.current?.value) return
-    onAddUser(newUserInputRef.current.value)
-    newUserInputRef.current.value = ''
-  }, [onAddUser])
+  const onSubmit: SubmitHandler<FormData> = React.useCallback(
+    ({ name }) => {
+      if (!name) return
+      onAddUser(name)
+      setValue('name', '')
+    },
+    [onAddUser, setValue]
+  )
 
   return (
     <S.Wrapper>
@@ -34,16 +54,18 @@ const UserList: React.VFC<UserListProps> = ({
             ))}
           </S.List>
 
-          <S.Controls>
+          <S.Form onSubmit={handleSubmit(onSubmit)}>
             <S.NewUserInput
               type="text"
-              name="newUser"
-              id="newUser"
               placeholder="Type user name"
-              ref={newUserInputRef}
+              autoComplete="off"
+              {...register('name')}
             />
-            <Button onClick={handleAddButtonClick}>Add user</Button>
-          </S.Controls>
+
+            <Button type="submit" disabled={!isDirty || !isValid}>
+              Add user
+            </Button>
+          </S.Form>
         </>
       )}
       {!users.length && <p>No users connected</p>}

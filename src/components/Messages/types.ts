@@ -14,3 +14,7 @@ export type LoggedUser = {
   id: number
   name: string
 }
+
+export type FormData = {
+  message: string
+}

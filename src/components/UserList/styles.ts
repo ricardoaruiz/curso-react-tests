@@ -14,7 +14,7 @@ export const List = styled.ul`
   padding: 1rem;
   border: 1px solid black;
 `
-export const Controls = styled.div`
+export const Form = styled.form`
   display: flex;
   flex-direction: row;
   margin-top: 10px;

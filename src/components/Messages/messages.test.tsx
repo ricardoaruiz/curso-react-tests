@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 
 import { Messages } from '.'
 import { LoggedUser, Message } from './types'
@@ -73,7 +73,7 @@ describe('<Messages />', () => {
     expect(messages).not.toBeInTheDocument()
   })
 
-  it('should be call onSendMessage callback when "Send Message" button is clicked and message field not is empty', () => {
+  it('should be call onSendMessage callback when "Send Message" button is clicked and message field not is empty', async () => {
     const mockedOnSendMessage = jest.fn()
     render(
       <Messages
@@ -87,13 +87,23 @@ describe('<Messages />', () => {
       name: /send message/i,
     })
     expect(sendMessageButton).toBeInTheDocument()
+    expect(sendMessageButton).toBeDisabled()
 
     const inputMessage = screen.getByPlaceholderText(/type your message here/i)
     expect(inputMessage).toBeInTheDocument()
-    userEvent.clear(inputMessage)
-    userEvent.type(inputMessage, 'This is a new message from user id 10')
 
-    userEvent.click(sendMessageButton)
+    await act(async () => {
+      userEvent.clear(inputMessage)
+      userEvent.type(inputMessage, 'This is a new message from user id 10')
+      userEvent.tab()
+    })
+
+    expect(sendMessageButton).toBeEnabled()
+
+    await act(async () => {
+      userEvent.click(sendMessageButton)
+    })
+
     expect(mockedOnSendMessage).toHaveBeenCalledTimes(1)
     expect(mockedOnSendMessage).toHaveBeenCalledWith({
       id: 7,
@@ -103,7 +113,7 @@ describe('<Messages />', () => {
     expect(inputMessage).toHaveValue('')
   })
 
-  it('should not be call onSendMessage callback when "Send Message" button is clicked and message field is empty', () => {
+  it('should not be call onSendMessage callback when "Send Message" button is clicked and message field is empty', async () => {
     const mockedOnSendMessage = jest.fn()
     render(
       <Messages
@@ -117,8 +127,11 @@ describe('<Messages />', () => {
       name: /send message/i,
     })
     expect(sendMessageButton).toBeInTheDocument()
+    expect(sendMessageButton).toBeDisabled()
 
-    userEvent.click(sendMessageButton)
+    await act(async () => {
+      userEvent.click(sendMessageButton)
+    })
     expect(mockedOnSendMessage).not.toHaveBeenCalled()
   })
 })

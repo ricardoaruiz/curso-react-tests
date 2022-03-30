@@ -29,7 +29,7 @@ export const Message = styled.li<MessageProps>`
   }
 `
 
-export const Controls = styled.div`
+export const Form = styled.form`
   display: flex;
   margin-top: 10px;
 

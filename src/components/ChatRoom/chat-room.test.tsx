@@ -1,6 +1,6 @@
 /* eslint-disable testing-library/no-node-access */
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { ChatRoom } from '.'
@@ -38,10 +38,19 @@ describe('<ChatRoom />', () => {
 
     const addUserButton = screen.getByRole('button', { name: /add user/i })
     expect(addUserButton).toBeInTheDocument()
+    expect(addUserButton).toBeDisabled()
 
-    userEvent.clear(newUserInput)
-    userEvent.type(newUserInput, 'Bruce Benner')
-    userEvent.click(addUserButton)
+    await act(async () => {
+      userEvent.clear(newUserInput)
+      userEvent.type(newUserInput, 'Bruce Benner')
+      userEvent.tab()
+    })
+
+    expect(addUserButton).toBeEnabled()
+
+    await act(async () => {
+      userEvent.click(addUserButton)
+    })
 
     await waitFor(() => {
       const users = userList.children
@@ -63,15 +72,25 @@ describe('<ChatRoom />', () => {
       return messages
     })
 
-    const inputMessage = screen.getByPlaceholderText(/type your message here/i)
-    userEvent.clear(inputMessage)
-    userEvent.type(inputMessage, 'New message has been send')
-
     const sendMessageButton = screen.getByRole('button', {
       name: /send message/i,
     })
+    expect(sendMessageButton).toBeInTheDocument()
+    expect(sendMessageButton).toBeDisabled()
 
-    userEvent.click(sendMessageButton)
+    const inputMessage = screen.getByPlaceholderText(/type your message here/i)
+
+    await act(async () => {
+      userEvent.clear(inputMessage)
+      userEvent.type(inputMessage, 'New message has been send')
+      userEvent.tab()
+    })
+
+    expect(sendMessageButton).toBeEnabled()
+
+    await act(async () => {
+      userEvent.click(sendMessageButton)
+    })
     await waitFor(() => {
       const messages = messageList.children
       expect(messages).toHaveLength(7)

@@ -1,30 +1,50 @@
 import React from 'react'
-import { MessagesProps } from './types'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
+
+import { MessagesProps, FormData } from './types'
 import { Button } from '../Button'
 
 import * as S from './styles'
+
+const schema = yup
+  .object({
+    message: yup.string().required('Message is required'),
+  })
+  .required()
 
 const Messages: React.VFC<MessagesProps> = ({
   loggedUser,
   items,
   onSendMessage,
 }) => {
-  const inputNewMessageRef = React.useRef<HTMLInputElement | null>(null)
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { isDirty, isValid },
+  } = useForm<FormData>({
+    mode: 'all',
+    resolver: yupResolver(schema),
+  })
 
   const nextMessageId = React.useMemo(() => {
     return !items.length ? 1 : items[items.length - 1].id + 1
   }, [items])
 
-  const handleSendMessageButtonClick = React.useCallback(() => {
-    if (!inputNewMessageRef.current?.value) return
-
-    onSendMessage({
-      id: nextMessageId,
-      from: loggedUser,
-      text: inputNewMessageRef.current.value,
-    })
-    inputNewMessageRef.current.value = ''
-  }, [loggedUser, nextMessageId, onSendMessage])
+  const onSubmit: SubmitHandler<FormData> = React.useCallback(
+    ({ message }) => {
+      if (!message) return
+      onSendMessage({
+        id: nextMessageId,
+        from: loggedUser,
+        text: message,
+      })
+      setValue('message', '')
+    },
+    [loggedUser, nextMessageId, onSendMessage, setValue]
+  )
 
   return (
     <S.Wrapper>
@@ -37,16 +57,17 @@ const Messages: React.VFC<MessagesProps> = ({
         ))}
       </S.Messages>
 
-      <S.Controls>
+      <S.Form onSubmit={handleSubmit(onSubmit)}>
         <S.InputMessage
           type="text"
-          name="message"
-          id="message"
           placeholder="Type your message here"
-          ref={inputNewMessageRef}
+          autoComplete="off"
+          {...register('message')}
         />
-        <Button onClick={handleSendMessageButtonClick}>Send Message</Button>
-      </S.Controls>
+        <Button type="submit" disabled={!isDirty || !isValid}>
+          Send Message
+        </Button>
+      </S.Form>
     </S.Wrapper>
   )
 }
